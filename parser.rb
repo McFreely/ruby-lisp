@@ -99,12 +99,3 @@ def unparse(ast)
 	end 
 end
 
-
-# To move in own file when refactoring
-def is_boolean(ast)
-	ast.instance_of? String
-end
-
-def is_list(ast)
-	ast.instance_of? Array
-end
