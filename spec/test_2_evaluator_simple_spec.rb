@@ -2,7 +2,7 @@ require 'spec_helper'
 require './evaluator'
 require './types'
 
-describe 'Evaluation' do
+describe 'Simple Evaluation' do
 	environment = Environment.new
 	
 	it "should evaluate booleans to themselves" do
@@ -74,10 +74,10 @@ describe 'Evaluation' do
 	end
 
 	it 'should evaluate math operations only on numbers' do
-		expect(evaluate(["+", 1 ,["quote", "foo"]], environment)).to raise_error(TypeError)
-		expect(evaluate(["-", 1 ,["quote", "foo"]], environment)).to raise_error(TypeError)
-		expect(evaluate(["*", 1 ,["quote", "foo"]], environment)).to raise_error(TypeError)
-		expect(evaluate(["+", 1 ,["quote", "foo"]], environment)).to raise_error(TypeError)
-		expect(evaluate(["mod", 1 ,["quote", "foo"]], environment)).to raise_error(TypeError)
+		expect(evaluate(["+", 1 ,["quote", "foo"]], environment)).to raise_error(LispError)
+		expect(evaluate(["-", 1 ,["quote", "foo"]], environment)).to raise_error(LispError)
+		expect(evaluate(["*", 1 ,["quote", "foo"]], environment)).to raise_error(LispError)
+		expect(evaluate(["+", 1 ,["quote", "foo"]], environment)).to raise_error(LispError)
+		expect(evaluate(["mod", 1 ,["quote", "foo"]], environment)).to raise_error(LispError)
 	end
 end

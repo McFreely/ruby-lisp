@@ -54,7 +54,7 @@ describe "Parsing" do
 	it "should raise an execption if any paren is missing" do
 		program = "(foo (bar x y)"
 
-		expect(parse(program)).to raise_error(ArgumentError)
+		expect(parse(program)).to raise_error(LispError, "Incomplete expression")
 	end
 
 	it "should raise an execption if there is too much parens" do
@@ -62,7 +62,7 @@ describe "Parsing" do
 		# Anything more than this, should result in the proper exception
 		program = "(foo (bar x y)))"
 
-		expect(parse(program)).to raise_error(ArgumentError)
+		expect(parse(program)).to raise_error(LispError, "Expected EOF")
 	end
 
 	it "should remove excess whitespace" do
