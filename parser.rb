@@ -3,6 +3,8 @@
 # Its job is to convert strings into data structures that
 # the evaluator can understand
 
+require_relative 'ast'
+
 def parse(source)
 	# Parse string representation of one *single*
 	# expression into the corresponding Abstract Syntax Tree
@@ -23,7 +25,7 @@ end
 def find_matching_paren(source, start = 0)
 	# Given a string and the index of an opening paren,
 	# determines the index of the matching closing paren.
-	raise "The program is not valid Lisp" unless source[start] == "("
+	raise ArgumentError, "Invalid Lisp" unless source[start] == "("
 	pos = start
 	open_parens = 1
 	while open_parens > 0 do
@@ -84,18 +86,18 @@ def parse_multiple(source)
 	end
 end
 
-def unparse(ast)
+def unparse(as_tree)
 	# Turn an AST back into lisp program source
-	if is_boolean(ast)
-		ast ? '#t' : '#f'
-	elsif is_list(ast)
-		if ast.length > 0 && ast[0] == "quote"
-			return "'%s" % [unparse(ast[1])]
+	if is_boolean?(as_tree)
+		as_tree = as_tree ? '#t' : '#f'
+	elsif is_list?(as_tree)
+		if as_tree.length > 0 && as_tree[0] == "quote"
+			return "'%s" % [unparse(as_tree[1])]
 		else
-			return "(%s)" % [ast.each {|x| x.join(" ")}]
+		    
+			return "(%s)" % [as_tree.map {|x| unparse(x)}.join(" ")]
 		end
 	else
-		ast.to_s
+		as_tree.to_s
 	end 
 end
-
