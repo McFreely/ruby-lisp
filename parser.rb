@@ -4,6 +4,7 @@
 # the evaluator can understand
 
 require_relative 'ast'
+require_relative 'types'
 
 def parse(source)
 	# Parse string representation of one *single*
@@ -31,7 +32,7 @@ def find_matching_paren(source, start = 0)
 	while open_parens > 0 do
 		pos += 1
 		if source.length == pos 
-			raise ArgumentError, 'Incomplete Expression'
+			raise LispError, "Incomplete expression"
 		elsif source[pos] == "("
 			open_parens += 1
 		elsif source[pos] == ")"
