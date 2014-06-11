@@ -20,7 +20,7 @@ end
 
 def remove_comments(source)
 	# Remove from a string anything in between a ; and a linebreak
-	source.sub(/;.*\n/, "\n")
+	source.gsub(/;.*/, "")
 end
 
 def find_matching_paren(source, start = 0)
@@ -45,11 +45,11 @@ end
 def split_exps(source)
 	# Splits a source string into subexpressions
 	# that can be parsed individually.
-	source = source.strip
+	rest = source.strip
 	exps = []
 	while rest
 		exp, rest = first_expression(rest)
-		exps.app(exp)
+		exps << exp
 	end
 	exps
 end
@@ -66,8 +66,8 @@ def first_expression(source)
 		last = find_matching_paren(source)
 		return source[0..last + 1], source[last + 1..-1]
 	else
-		match = /^[^\s)']+/.match(source) # some renaming to do here
-		ending = match.end(0)
+		m = /^[^\s)']+/.match(source)
+		ending = m.end(0)
 		atom = source[0..ending]
 		return atom, source[ending..-1]
 	end
