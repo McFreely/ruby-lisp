@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 require './interpreter'
 require './types'
 

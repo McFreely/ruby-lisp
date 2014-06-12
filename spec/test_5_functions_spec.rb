@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 require './ast'
 require './evaluator'
 require './parser'
