@@ -9,8 +9,10 @@ require_relative 'types'
 def parse(source)
 	# Parse string representation of one *single*
 	# expression into the corresponding Abstract Syntax Tree
-
-	raise NotImplementedError, "Do It Yourself"
+	
+	# to do in order like Jiw Weirlich
+	# From simple to complex, following the specs
+	raise Exception, "Do it Yourself"
 end
 
 # Below are a few useful utility functions. These should
@@ -20,19 +22,19 @@ end
 
 def remove_comments(source)
 	# Remove from a string anything in between a ; and a linebreak
-	source.gsub(/;.*/, "")
+	source.gsub(/;.*\n/, "\n")
 end
 
 def find_matching_paren(source, start = 0)
 	# Given a string and the index of an opening paren,
 	# determines the index of the matching closing paren.
-	raise ArgumentError, "Invalid Lisp" unless source[start] == "("
+	raise ArgumentError, "Invalid Lisp" unless source[start] == "("	
 	pos = start
 	open_parens = 1
-	while open_parens > 0 do
+	until open_parens <= 0 do
 		pos += 1
 		if source.length == pos 
-			raise LispError, "Incomplete expression"
+			raise LispError, "Incomplete expression: %s" % source[start..-1]
 		elsif source[pos] == "("
 			open_parens += 1
 		elsif source[pos] == ")"
@@ -47,7 +49,7 @@ def split_exps(source)
 	# that can be parsed individually.
 	rest = source.strip
 	exps = []
-	while rest
+	until rest.empty?
 		exp, rest = first_expression(rest)
 		exps << exp
 	end
@@ -64,12 +66,15 @@ def first_expression(source)
 		return source[0] + exp, rest
 	elsif source[0] == "("
 		last = find_matching_paren(source)
-		return source[0..last + 1], source[last + 1..-1]
+		return source[0..last], source[last+1..-1]
 	else
-		m = /^[^\s)']+/.match(source)
-		ending = m.end(0)
-		atom = source[0..ending]
-		return atom, source[ending..-1]
+		pat = /^[^\s)']+/ 
+		m = pat.match(source)
+		unless m.nil? 
+		    ending = m.end(0)
+			atom = source[0..ending-1]
+			return atom, source[ending..-1]
+		end
 	end
 end
 
@@ -101,4 +106,11 @@ def unparse(as_tree)
 	else
 		as_tree.to_s
 	end 
+end
+
+class String
+	# Helper for the class function
+	def is_numeric?
+		Float(self) != nil rescue false
+	end
 end
