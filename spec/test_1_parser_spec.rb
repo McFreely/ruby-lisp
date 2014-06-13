@@ -1,5 +1,6 @@
 require 'spec_helper'
 require './parser'
+require './types'
 
 describe "Parsing" do
 	it "should parse a single symbol" do
@@ -31,19 +32,18 @@ describe "Parsing" do
 		# Tip: the useful helper function 'find_matching_paren' is already provided
 		# in 'parser.rb'
 
-		list = %w(foo bar list)
 		empty_list = []
-		expect(parse('(foo bar baz)')).to eq(list)
+		expect(parse('(foo bar baz)')).to eq(["foo", "bar", "baz"])
 		expect(parse('()')).to eq(empty_list)
 	end
 
 	it "should parse a list of mixed types" do
 		# When parsing lists, make sure each of the sub-expressions are also parsed properly
 
-		expect(parse('(foo #t 123)')).to eq(%w(foo true 123))
+		expect(parse('(foo #t 123)')).to eq(["foo", true, 123])
 	end
 
-	it "should parse a snested list" do
+	it "should parse a nested list" do
 		program = '(foo (bar ((#t)) x) (baz y))'
 		ast = ['foo',
 		       ['bar', [[true]], 'x'],
@@ -54,7 +54,7 @@ describe "Parsing" do
 	it "should raise an execption if any paren is missing" do
 		program = "(foo (bar x y)"
 
-		expect(parse(program)).to raise_error(LispError, "Incomplete expression")
+		expect{parse(program)}.to raise_error(LispError, "Incomplete expression: %s" % program)
 	end
 
 	it "should raise an execption if there is too much parens" do
@@ -62,7 +62,8 @@ describe "Parsing" do
 		# Anything more than this, should result in the proper exception
 		program = "(foo (bar x y)))"
 
-		expect(parse(program)).to raise_error(LispError, "Expected EOF")
+		expect{parse(program)}.to raise_error(LispError, "Expected EOF")
+		
 	end
 
 	it "should remove excess whitespace" do
@@ -76,7 +77,7 @@ describe "Parsing" do
 		program = " ;the first line is a comment
 					     (define variable
 					     		;another comment
-					     		if #t
+					     		(if #t
 					     			 42 ;inline comment!
 					     			 (something else)))"
 
@@ -99,7 +100,7 @@ describe "Parsing" do
 					    
     ast = ['define', 'fact',
                     ['lambda', ['n'],
-                     ['if', ['<=', 'n', '1'],
+                     ['if', ['<=', 'n', 1],
                       1,
                       ['*', 'n', ["fact", ["-", "n", 1]]]]]]
 
@@ -117,14 +118,14 @@ describe "Parsing" do
   	#
   	# 		`foo       -> (quote foo)
   	#     `(foo bar) -> (quote (foo bar))
-  	program = "(foo `nil)"
+  	program = "(foo 'nil)"
   	ast = ["foo", ["quote", "nil"]]
 
   	expect(parse(program)).to eq(ast)
   end
 
   it 'should expand nested quotes' do
-  	program = "````foo"
+  	program = "''''foo"
   	ast = ["quote", ["quote", ["quote", ["quote", "foo"]]]]
 
   	expect(parse(program)).to eq(ast)

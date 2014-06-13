@@ -1,7 +1,7 @@
 require_relative 'types'
 
 # This module contains a few simple helper functions
-# for checking the type os as_trees
+# for checking the type of as_trees
 
 def is_symbol?(as_tree)
 	as_tree.instance_of? String
