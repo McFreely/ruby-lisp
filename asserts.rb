@@ -10,9 +10,9 @@ end
 
 def assert_valid_definition(d)
 	if d.length != 2
-		raise LispError, "Wrong number of arguments for variable definition: %s" % d
-	elsif !d[0].instance_of String
-		raise LispError, "Attempted to define non-symbol as variable: %s" % d
+		raise LispError, "Wrong number of arguments"
+	elsif !d[0].kind_of? String
+		raise LispError, "Non-symbol"
 	end
 end
 

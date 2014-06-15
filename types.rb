@@ -1,6 +1,7 @@
 # This module holds some types we'll have use for along the way.
 #
 # It's your job to implement the Closure and Environment types.
+# require 'pry'
 
 class LispError < StandardError
 end
@@ -16,20 +17,31 @@ class Closure
 end
 
 class Environment
-	def init()
+	attr_accessor :variables
+
+	def initialize(variables={})
 		# There is a way to refactor this that elludes me at the moment
-		self.variables = variables if variables else {}
+		@variables = variables
 	end
 
 	def lookup(symbol)
-		raise NotImplementError, "Do it Yourself"
+		# binding.pry
+		if @variables[symbol].nil?
+			raise LispError, "%s" % symbol
+		else
+			@variables[symbol]
+		end
 	end
 
 	def extend(variables)
-		raise NotImplementError, "Do it Yourself"
+		return self.class.new(@variables.merge(variables))
 	end
 
 	def set(symbol, value)
-		raise NotImplementError, "Do it Yourself"
+		if @variables.has_key?(symbol)
+			raise LispError, "Variable already defined"
+		else 
+			@variables[symbol] = value
+		end
 	end
 end

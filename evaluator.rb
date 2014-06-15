@@ -13,6 +13,7 @@ require_relative 'parser'
 # after all.)
 
 def evaluate(ast, env)
+  return env.lookup(ast) if is_symbol?(ast)
   return ast if is_atom?(ast)
   if is_list?(ast)
   	if ast[0] == "quote"
@@ -25,6 +26,8 @@ def evaluate(ast, env)
   		eval_math(ast, env)
   	elsif ast[0] == "if"
   		eval_if(ast, env)
+  	elsif ast[0] == "define"
+  		eval_define(ast, env)
   	end
   end
 end
@@ -67,4 +70,10 @@ end
 def eval_if(ast, env)
 	assert_expression_length(ast, 4)
 	evaluate(ast[1], env) ? evaluate(ast[2], env) : evaluate(ast[3], env)
+end
+
+def eval_define(ast, env)
+	assert_valid_definition(ast[1..-1])
+    env.set(ast[1], evaluate(ast[2],env))
+    return ast[1]
 end
