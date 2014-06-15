@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 require './evaluator'
 require './types'
 require './parser'
