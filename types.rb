@@ -7,8 +7,12 @@ class LispError < StandardError
 end
 
 class Closure
-	def init(env, params, body)
-		raise NotImplementError, "Do it Yourself"
+	attr_accessor :env, :params, :body
+	def initialize(env, params, body)
+		raise LispError unless is_list?(params)
+		@env = env
+		@params = params
+		@body = body
 	end
 
 	def str

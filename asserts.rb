@@ -2,9 +2,9 @@ require_relative 'parser'
 
 def assert_expression_length(ast, length)
 	if ast.length > length
-		raise LispError, "Malformed %s, too many arguments: %s" % ast[0], unparse(ast)
+		raise LispError
 	elsif ast.length < length
-		raise LispError, "Malformed %s, too few arguments: %s" % ast[0], unparse(ast)
+		raise LispError
 	end
 end
 

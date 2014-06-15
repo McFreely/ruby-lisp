@@ -48,7 +48,7 @@ end
 def find_matching_paren(source, start = 0)
 	# Given a string and the index of an opening paren,
 	# determines the index of the matching closing paren.
-	raise ArgumentError, "Invalid Lisp" unless source[start] == "("	
+	raise LispError, "Invalid Lisp" unless source[start] == "("	
 	pos = start
 	open_parens = 1
 	until open_parens <= 0 do

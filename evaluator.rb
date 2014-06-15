@@ -12,6 +12,8 @@ require_relative 'parser'
 # making your work a bit easier. (We're supposed to get through this thing in a day,
 # after all.)
 
+# require 'pry'
+
 def evaluate(ast, env)
   return env.lookup(ast) if is_symbol?(ast)
   return ast if is_atom?(ast)
@@ -28,6 +30,16 @@ def evaluate(ast, env)
   		eval_if(ast, env)
   	elsif ast[0] == "define"
   		eval_define(ast, env)
+  	elsif ast[0] == "lambda"
+  		eval_lambda(ast, env)
+  	elsif is_closure?(ast[0])
+  		apply(ast, env)
+    elsif is_symbol?(ast[0]) || is_list?(ast[0])
+  	 	closure = evaluate(ast[0], env)
+  	 	new_ast = [closure] + ast[1..-1]
+  	    evaluate(new_ast, env)
+  	else
+  		raise LispError, 'not a function'
   	end
   end
 end
@@ -74,6 +86,31 @@ end
 
 def eval_define(ast, env)
 	assert_valid_definition(ast[1..-1])
-    env.set(ast[1], evaluate(ast[2],env))
-    return ast[1]
+    symbol = ast[1]
+    value = evaluate(ast[2], env)
+    env.set(symbol, value)
+    symbol
+end
+
+def eval_lambda(ast, env)
+	raise LispError, "Wrong number of Arguments" unless ast.length == 3
+	params = ast[1]
+	raise LispError, "Lamdba parameter as non-list" unless is_list?(params)
+	body = ast[2]
+	Closure.new(env, params, body)
+end
+
+def apply(ast, env)
+	closure = ast[0]
+	args = ast[1..-1]
+	if args.length != closure.params.length
+		msg = "wrong number of arguments, expected #{closure.params.length} got #{args.length}"
+		raise LispError, msg
+	end
+	args = args.collect do |a|
+		evaluate(a, env)
+	end
+	bindings = Hash[closure.params.zip(args)]
+	new_env = closure.env.extend(bindings)
+	evaluate(closure.body, new_env)
 end

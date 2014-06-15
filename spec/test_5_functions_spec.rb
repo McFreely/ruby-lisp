@@ -14,13 +14,13 @@ describe 'Closure' do
 	it 'should evaluate to a closure' do
 		ast = ["lambda", [], 42]
 		closure = evaluate(ast, Environment.new)
-		expect closure.to be_a Closure
+		expect(closure).to be_a Closure
 	end
 
 	it 'should keep a copy of the env where it was defined' do
 		# Once we start calling functions later, we'll need access to the environment
 		# from when the function was created in order to resolve all free variables.
-		env = Environment({"foo" => 1, "bar" => 2})
+		env = Environment.new({"foo" => 1, "bar" => 2})
 		ast = ["lambda", [], 42]
 		closure = evaluate(ast, env)
 		expect(closure.env).to eq(env)
@@ -35,16 +35,13 @@ describe 'Closure' do
 
 	it 'parameters should be a list' do
 		closure = evaluate(parse("(lambda (x y) (+ x y))"), Environment.new)
-		incorrect_closure = evaluate(parse('(lambda not-a-list (body of fn))'), Environment.new)
 		
 		expect(is_list?(closure.params)).to eq(true)
-		expect(incorrect_closure).to raise_error(LispError)
+		expect{evaluate(parse('(lambda not-a-list (body of fn))'), Environment.new)}.to raise_error(LispError, "Lamdba parameter as non-list")
 	end
 
 	it 'should expect exactly two arguments' do
-		closure = evaluate(parse("(lambda (foo) (bar) (baz))"), Environment.new)
-
-		expect(closure).to raise_error(LispError, "number of arguments")
+		expect{evaluate(parse("(lambda (foo) (bar) (baz))"), Environment.new)}.to raise_error(LispError, "Wrong number of Arguments")
 	end
 
 	it "should define lambda with error in body" do
@@ -83,7 +80,7 @@ describe 'Functions calls' do
 	it 'should evaluate call to closure with arguments' do
 		# The function body must be evaluated in a environment where the parameters are bound.
 		#
-		# Create an env whre the function parameters (which are stored in the closure) are bound
+		# Create an env where the function parameters (which are stored in the closure) are bound
 		# to the actual argument values in the function call. Use this env when evaluating
 		# the function body.
 
@@ -98,7 +95,7 @@ describe 'Functions calls' do
 		# When a functin is applied, the arguments should be evaluated before being bound
 		# to the parameter names.
 		env = Environment.new
-		closure = evaluate(parse("(lambda (a b) (+ a 5))"), env)
+		closure = evaluate(parse("(lambda (a) (+ a 5))"), env)
 		ast = [closure, parse("(if #f 0 (+ 10 10))")]
 
 		expect(evaluate(ast,env)).to eq(25)
@@ -108,9 +105,9 @@ describe 'Functions calls' do
 		# The function's free variables, i.e. those not specified as part of the parameter list,
 		# should be looked up in the environment from where the function was defined. This is
 		# the env included in the closure. Make sure this environment is used when evaluating the body.
-		closure = evaluate(parse("(lambda (x) (+ x y))"), Environment({"y" => 1}))
+		closure = evaluate(parse("(lambda (x) (+ x y))"), Environment.new({"y" => 1}))
 		ast = [closure, 0]
-		result = evaluate(ast, Environment({"y" => 2}))
+		result = evaluate(ast, Environment.new({"y" => 2}))
 
 		expect(result).to eq(1)
 	end
@@ -132,10 +129,10 @@ describe 'Lambda' do
 		# the environment (which should be a function closure). An AST with the variables
 		# replaced with its value should then be evaluated instead.
 		env = Environment.new
-		evaluate(parse("(define add (lamdba (x y) (+ x y)))"), env)
+		evaluate(parse("(define add (lambda (x y) (+ x y)))"), env)
 		expect(env.lookup("add")).to be_a Closure
 
-		result = evalute(parse("(add 1 2)"), env)
+		result = evaluate(parse("(add 1 2)"), env)
 		expect(result).to eq(3)
 	end
 
@@ -158,7 +155,7 @@ describe 'Lambda' do
 						wont-evaluate-this-branch
 						(lambda (x) (+ x y)))
 					  2)")
-		env = Environment({"y" => 3})
+		env = Environment.new({"y" => 3})
 		expect(evaluate(ast, env)).to eq(5)
 	end
 #
@@ -166,8 +163,8 @@ describe 'Lambda' do
 #
 
 	it 'should result in an error when calling a non-function' do
-		expect(evaluate(parse("(#t 'foo 'bar)"), Environment.new)).to raise_error(LispError, "not a function")
-		expect(evaluate(parse("(42)"), Environment.new)).to raise_error(LispError, "not a function")
+		expect{evaluate(parse("(#t 'foo 'bar)"), Environment.new)}.to raise_error(LispError, "not a function")
+		expect{evaluate(parse("(42)"), Environment.new)}.to raise_error(LispError, "not a function")
 	end
 
 	it 'should make sure arguments are evaluated' do
@@ -184,8 +181,7 @@ describe 'Lambda' do
 	it 'should raise exceptions when called with wrong number of arguments' do
 		env = Environment.new
 		evaluate(parse("(define fn (lambda (p1 p2) 'whatever))"), env)
-		error_msg = "wrong number of arguments, expected 2 got 3"
-		expect(parse("(fn 1 2 3)")).to raise_error(LispError, error_msg)
+		expect{evaluate(parse("(fn 1 2 3)"), env)}.to raise_error(LispError, "wrong number of arguments, expected 2 got 3")
 	end
 
 #
