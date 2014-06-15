@@ -23,6 +23,8 @@ def evaluate(ast, env)
   		eval_eq(ast, env)
   	elsif ["+", "-", "*", "/", "mod", ">"].include? ast[0]
   		eval_math(ast, env)
+  	elsif ast[0] == "if"
+  		eval_if(ast, env)
   	end
   end
 end
@@ -60,4 +62,9 @@ def eval_math(ast, env)
 	else
 		raise LispError
 	end
+end
+
+def eval_if(ast, env)
+	assert_expression_length(ast, 4)
+	evaluate(ast[1], env) ? evaluate(ast[2], env) : evaluate(ast[3], env)
 end
