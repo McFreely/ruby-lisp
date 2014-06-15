@@ -5,7 +5,7 @@
 class LispError < StandardError
 end
 
-class Clojure
+class Closure
 	def init(env, params, body)
 		raise NotImplementError, "Do it Yourself"
 	end
