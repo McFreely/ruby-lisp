@@ -12,7 +12,27 @@ def parse(source)
 	
 	# to do in order like Jiw Weirlich
 	# From simple to complex, following the specs
-	raise Exception, "Do it Yourself"
+	source = remove_comments(source)
+	exp, rest = first_expression(source)
+	
+	unless rest.empty?
+		raise LispError, 'Expected EOF'
+	end
+
+	if exp == "#t"
+		true
+	elsif exp =="#f"
+		false
+	elsif exp.is_numeric? # Culprit for returning 0
+		exp.to_i
+	elsif exp[0] == "'"
+		["quote", parse(exp[1..-1])]
+	elsif exp[0] == "("
+		ending = find_matching_paren(exp)
+		split_exps(exp[1..ending-1]).collect {|e| parse(e)}
+	else
+		source
+	end
 end
 
 # Below are a few useful utility functions. These should
@@ -28,7 +48,7 @@ end
 def find_matching_paren(source, start = 0)
 	# Given a string and the index of an opening paren,
 	# determines the index of the matching closing paren.
-	raise ArgumentError, "Invalid Lisp" unless source[start] == "("	
+	raise LispError, "Invalid Lisp" unless source[start] == "("	
 	pos = start
 	open_parens = 1
 	until open_parens <= 0 do
