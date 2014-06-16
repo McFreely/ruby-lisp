@@ -6,14 +6,14 @@ require './types'
 
 
 describe 'Standard Lib' do
-	before(:all) do
-		env = Environment.new
+	let(:env) { env = Environment.new }
+	before(:each) do
 		interpret_file('stdlib.diy', env)
 	end
 
 	it 'implements the not operator' do
-		expect(interpret("(not #f)")).to eq("#t")
-		expect(interpret("(not #t)")).to eq("#f")
+		expect(interpret("(not #f)", env)).to eq("#t")
+		expect(interpret("(not #t)", env)).to eq("#f")
 	end
 
 	it 'implements the or operator' do

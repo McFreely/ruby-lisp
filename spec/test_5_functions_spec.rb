@@ -151,10 +151,7 @@ describe 'Lambda' do
 		# which will result in a 'lambda' expressions. The lambda is evaluated, giving a 
 		# closure. The result is an AST with a 'closure' as the first element, which we
 		# already know how to evaluate.
-		ast = parse("((if #f
-						wont-evaluate-this-branch
-						(lambda (x) (+ x y)))
-					  2)")
+		ast = parse("((if #f wont-evaluate-this-branch (lambda (x) (+ x y))) 2)")
 		env = Environment.new({"y" => 3})
 		expect(evaluate(ast, env)).to eq(5)
 	end
@@ -191,12 +188,7 @@ describe 'Lambda' do
 
 	it 'should be recursive' do
 		env = Environment.new
-		evaluate(parse("(define my-fn
-			;; A meaningless, but recursive, function
-			(lambda (x)
-				(if (eq x 0)
-					42
-					(my-fn (- x 1)))))"), env)
+		evaluate(parse("(define my-fn (lambda (x) (if (eq x 0) 42 (my-fn (- x 1)))))"), env)
 		expect(evaluate(parse('(my-fn 0)'), env)).to eq(42)
 		expect(evaluate(parse('(my-fn 10)'), env)).to eq(42)
 	end

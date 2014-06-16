@@ -54,7 +54,7 @@ describe "Parsing" do
 	it "should raise an execption if any paren is missing" do
 		program = "(foo (bar x y)"
 
-		expect{parse(program)}.to raise_error(LispError, "Incomplete expression: %s" % program)
+		expect{parse(program)}.to raise_error(LispError)
 	end
 
 	it "should raise an execption if there is too much parens" do
@@ -74,11 +74,11 @@ describe "Parsing" do
 	end
 
 	it "should strip comments" do
-		program = " ;the first line is a comment
+		program = " ;;the first line is a comment
 					     (define variable
 					     		;another comment
 					     		(if #t
-					     			 42 ;inline comment!
+					     			 42 ;;inline comment!
 					     			 (something else)))"
 
 		ast = ["define", "variable",

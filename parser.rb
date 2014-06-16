@@ -42,7 +42,9 @@ end
 
 def remove_comments(source)
 	# Remove from a string anything in between a ; and a linebreak
-	source.gsub(/;.*\n/, "\n")
+	source = source.gsub(/;.*/, " ")
+	source = source.delete("\n\t")
+	source
 end
 
 def find_matching_paren(source, start = 0)
@@ -107,7 +109,7 @@ def parse_multiple(source)
 	# Create a list of ASTs from program source constituting
 	# multiple expressions.
 	source = remove_comments(source)
-	split_exps(source).each do |exp|
+	split_exps(source).collect do |exp|
 		parse(exp)
 	end
 end

@@ -19,11 +19,11 @@ describe 'find_parens' do
 	end
 
 	it 'should throw an expection on bad initial position' do
-		expect{find_matching_paren("string without paren", 4)}.to raise_error(ArgumentError, "Invalid Lisp")
+		expect{find_matching_paren("string without paren", 4)}.to raise_error(LispError)
 	end
 
 	it 'should throw an expection when there is no closing paren' do		
-		expect{find_matching_paren("string (without matching paren", 7)}.to raise_error(LispError, 'Incomplete expression')
+		expect{find_matching_paren("string (without matching paren", 7)}.to raise_error(LispError)
 	end
 end
 
