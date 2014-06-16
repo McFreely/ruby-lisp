@@ -9,6 +9,7 @@ require_relative 'parser'
 # of your language, and the focus for most of parts 2 through 6
 #
 # A score of useful functions is provided for you, as per the above imports,
+
 # making your work a bit easier. (We're supposed to get through this thing in a day,
 # after all.)
 
@@ -16,30 +17,52 @@ require_relative 'parser'
 
 def evaluate(ast, env)
   return env.lookup(ast) if is_symbol?(ast)
+  
   return ast if is_atom?(ast)
+  
   if is_list?(ast)
+  	
   	if ast[0] == "quote"
   		eval_quote(ast, env)
+  	
   	elsif ast[0] == "atom"
   		eval_atom(ast, env)
+  	
   	elsif ast[0] == "eq"
   		eval_eq(ast, env)
+  	
   	elsif ["+", "-", "*", "/", "mod", ">"].include? ast[0]
   		eval_math(ast, env)
+  	
   	elsif ast[0] == "if"
   		eval_if(ast, env)
+  	
   	elsif ast[0] == "define"
   		eval_define(ast, env)
+  	
   	elsif ast[0] == "lambda"
   		eval_lambda(ast, env)
+
+  	elsif ast[0] == "cons"
+  		eval_cons(ast, env)
+  	elsif ast[0] == "head"
+  		ast[1][1].empty? ? raise(LispError) : ast[1][1][0]
+  	elsif ast[0] == "tail"
+  		ast[1][1][1..-1]
+  	elsif ast[0] == "empty"
+  		evaluate(ast[1],env).empty?
+
   	elsif is_closure?(ast[0])
   		apply(ast, env)
+    
     elsif is_symbol?(ast[0]) || is_list?(ast[0])
   	 	closure = evaluate(ast[0], env)
   	 	new_ast = [closure] + ast[1..-1]
   	    evaluate(new_ast, env)
+  
   	else
   		raise LispError, 'not a function'
+  
   	end
   end
 end
@@ -98,6 +121,13 @@ def eval_lambda(ast, env)
 	raise LispError, "Lamdba parameter as non-list" unless is_list?(params)
 	body = ast[2]
 	Closure.new(env, params, body)
+end
+
+def eval_cons(ast, env)
+	assert_expression_length(ast, 3)
+	car = evaluate(ast[1], env)
+	cdr = evaluate(ast[2], env)
+	cdr.insert(0, car)
 end
 
 def apply(ast, env)
