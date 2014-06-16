@@ -12,27 +12,7 @@ def parse(source)
 	
 	# to do in order like Jiw Weirlich
 	# From simple to complex, following the specs
-	source = remove_comments(source)
-	exp, rest = first_expression(source)
-	
-	unless rest.empty?
-		raise LispError, 'Expected EOF'
-	end
-
-	if exp == "#t"
-		true
-	elsif exp =="#f"
-		false
-	elsif exp.is_numeric? # Culprit for returning 0
-		exp.to_i
-	elsif exp[0] == "'"
-		["quote", parse(exp[1..-1])]
-	elsif exp[0] == "("
-		ending = find_matching_paren(exp)
-		split_exps(exp[1..ending-1]).collect {|e| parse(e)}
-	else
-		source
-	end
+	raise NotImplementedError, "Do it Yourself"
 end
 
 # Below are a few useful utility functions. These should
@@ -42,7 +22,9 @@ end
 
 def remove_comments(source)
 	# Remove from a string anything in between a ; and a linebreak
-	source.gsub(/;.*\n/, "\n")
+	source = source.gsub(/;.*/, " ")
+	source = source.delete("\n\t")
+	source
 end
 
 def find_matching_paren(source, start = 0)
@@ -107,7 +89,7 @@ def parse_multiple(source)
 	# Create a list of ASTs from program source constituting
 	# multiple expressions.
 	source = remove_comments(source)
-	split_exps(source).each do |exp|
+	split_exps(source).collect do |exp|
 		parse(exp)
 	end
 end
