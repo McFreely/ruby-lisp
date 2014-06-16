@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 require './evaluator'
 require './parser'
 require './types'
@@ -36,7 +38,7 @@ describe 'List' do
 	end
 
 	it 'cannot extract first element if empty' do
-		expect(evaluate(parse("(head (quote ()))"), Environment.new)).to raise_error(LispError)
+		expect{evaluate(parse("(head (quote ()))"), Environment.new)}.to raise_error(LispError)
 	end
 
 	it 'has a method to return its tail' do
@@ -49,7 +51,7 @@ describe 'List' do
 		expect(evaluate(parse("(empty '(1))"), Environment.new)).to eq(false)
 
 		expect(evaluate(parse("(empty '())"), Environment.new)).to eq(true)
-		expect(evaluate(parse("(empty (tail '(1))"), Environment.new)).to eq(true)
+		expect(evaluate(parse("(empty (tail '(1)))"), Environment.new)).to eq(true)
 	end
 end
 
