@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+require_relative 'interpreter'
+require_relative 'repl'
+
+if ARGV.length > 1
+	puts interpret_file(ARGV[1])
+else
+	repl
+end
