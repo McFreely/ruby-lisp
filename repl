@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
-require_relative 'interpreter'
-require_relative 'repl'
+require './code/interpreter'
+require './code/repl'
 
 if ARGV.length > 1
 	puts interpret_file(ARGV[1])

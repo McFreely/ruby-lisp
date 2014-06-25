@@ -1,9 +1,9 @@
 
 require 'spec_helper'
 
-require './evaluator'
-require './types'
-require './parser'
+require './code/evaluator'
+require './code/types'
+require './code/parser'
 
 describe 'Complex evaluation' do
 	env = Environment.new

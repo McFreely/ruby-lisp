@@ -1,8 +1,6 @@
-require 'spec_helper'
-
-require './parser'
-require './types'
-require './ast'
+require './code/parser'
+require './code/types'
+require './code/ast'
 # This file contains a few test for the code provided for part 1
 # All tests here should already pass, and should be of no concern to
 # you as a workshop attendee.

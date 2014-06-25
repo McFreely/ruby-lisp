@@ -1,9 +1,5 @@
-require 'spec_helper'
-
-require './interpreter'
-require './types'
-
-
+require './code/interpreter'
+require './code/types'
 
 describe 'Standard Lib' do
 	let(:env) { env = Environment.new }

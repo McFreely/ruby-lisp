@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-require './types'
-require './evaluator'
-require './parser'
+require './code/types'
+require './code/evaluator'
+require './code/parser'
 
 # Before we go on to evaluating programs using variables, we
 # need to implement an environment to store them in.
