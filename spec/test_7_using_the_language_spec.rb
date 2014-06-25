@@ -1,5 +1,5 @@
-require './interpreter'
-require './types'
+require './code/interpreter'
+require './code/types'
 
 
 

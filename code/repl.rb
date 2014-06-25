@@ -1,5 +1,3 @@
-require 'colorize'
-
 require_relative 'types'
 require_relative 'parser'
 require_relative 'interpreter'

@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-require './ast'
-require './evaluator'
-require './parser'
-require './types'
+require './code/ast'
+require './code/evaluator'
+require './code/parser'
+require './code/types'
 
 # This part is all about defining and using functions.
 #

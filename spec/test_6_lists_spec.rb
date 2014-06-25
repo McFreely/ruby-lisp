@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-require './evaluator'
-require './parser'
-require './types'
+require './code/evaluator'
+require './code/parser'
+require './code/types'
 
 describe 'List' do
 	it 'can be created by quoting' do

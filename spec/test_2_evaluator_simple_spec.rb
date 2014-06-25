@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'spec_helper'
-require './evaluator'
-require './types'
+require './code/evaluator'
+require './code/types'
 
 describe 'Simple Evaluation' do
   environment = Environment.new

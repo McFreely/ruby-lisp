@@ -1,6 +1,6 @@
 require 'spec_helper'
-require './parser'
-require './types'
+require './code/parser'
+require './code/types'
 
 describe "Parsing" do
 	it "should parse a single symbol" do
