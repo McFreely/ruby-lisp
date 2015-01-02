@@ -1,3 +1,5 @@
+require "minitest/autorun"
+
 require './code/interpreter'
 require './code/types'
 
@@ -8,21 +10,21 @@ describe 'Standard Lib' do
 	end
 
 	it 'implements the not operator' do
-		expect(interpret("(not #f)", env)).to eq("#t")
-		expect(interpret("(not #t)", env)).to eq("#f")
+		assert_equal interpret("(not #f)", env), "#t"
+		assert_equal interpret("(not #t)", env), "#f"
 	end
 
 	it 'implements the or operator' do
-		expect(interpret("(or #f #f)")).to eq("#f")
-		expect(interpret("(or #t #f)")).to eq("#t")
-		expect(interpret("(or #f #t)")).to eq("#t")
-		expect(interpret("(or #t #t)")).to eq("#t")
+		assert_equal interpret("(or #f #f)"), "#f"
+		assert_equal interpret("(or #t #f)"), "#t"
+		assert_equal interpret("(or #f #t)"), "#t"
+		assert_equal interpret("(or #t #t)"), "#t"
 	end
 
 	it 'implements the and operator' do
-		expect(interpret("(and #f #f)")).to eq("#f")
-		expect(interpret("(and #t #f)")).to eq("#f")
-		expect(interpret("(and #f #t)")).to eq("#f")
-		expect(interpret("(and #t #t)")).to eq("#t")
+		assert_equal interpret("(and #f #f)"), "#f"
+		assert_equal interpret("(and #t #f)"), "#f"
+		assert_equal interpret("(and #f #t)"), "#f"
+		assert_equal interpret("(and #t #t)"), "#t"
 	end
 end

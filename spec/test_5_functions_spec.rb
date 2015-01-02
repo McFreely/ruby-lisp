@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'minitest/autorun'
 
 require './code/ast'
 require './code/evaluator'
@@ -14,7 +14,7 @@ describe 'Closure' do
 	it 'should evaluate to a closure' do
 		ast = ["lambda", [], 42]
 		closure = evaluate(ast, Environment.new)
-		expect(closure).to be_a Closure
+		assert_kind_of(Closure, closure)
 	end
 
 	it 'should keep a copy of the env where it was defined' do
@@ -23,25 +23,26 @@ describe 'Closure' do
 		env = Environment.new({"foo" => 1, "bar" => 2})
 		ast = ["lambda", [], 42]
 		closure = evaluate(ast, env)
-		expect(closure.env).to eq(env)
+		assert_equal closure.env, env
 	end
 
 	it 'should contain the parameter list and function body' do
 		closure = evaluate(parse("(lambda (x y) (+ x y))"), Environment.new)
 
-		expect(closure.params).to eq(["x", "y"])
-		expect(closure.body).to eq(["+", "x", "y"])		
+		assert_equal closure.params, ["x", "y"]
+		assert_equal closure.body, ["+", "x", "y"]
 	end
 
 	it 'parameters should be a list' do
 		closure = evaluate(parse("(lambda (x y) (+ x y))"), Environment.new)
 		
-		expect(is_list?(closure.params)).to eq(true)
-		expect{evaluate(parse('(lambda not-a-list (body of fn))'), Environment.new)}.to raise_error(LispError, "Lamdba parameter as non-list")
+		assert_equal is_list?(closure.params), true
+		assert_raises(LispError, "Lamdba parameter as non-list") {evaluate(parse('(lambda not-a-list (body of fn))'), Environment.new)}
+
 	end
 
 	it 'should expect exactly two arguments' do
-		expect{evaluate(parse("(lambda (foo) (bar) (baz))"), Environment.new)}.to raise_error(LispError, "Wrong number of Arguments")
+		assert_raises(LispError, "Wrong number of Arguments") {evaluate(parse("(lambda (foo) (bar) (baz))"), Environment.new)}
 	end
 
 	it "should define lambda with error in body" do
@@ -53,7 +54,7 @@ describe 'Closure' do
 		env = Environment.new
 		ast = parse("(lambda (x y)
 						(function body ((that) would never) work))")
-		expect(evaluate(ast, env)).to be_a Closure
+		assert_kind_of(Closure, evaluate(ast, env))
 	end
 end
 
@@ -74,7 +75,7 @@ describe 'Functions calls' do
 		closure = evaluate(parse("(lambda () (+ 1 2))"), Environment.new)
 		ast = [closure]
 		result = evaluate(ast, Environment.new)
-		expect(result).to eq(3)
+		assert_equal result, 3
 	end 
 
 	it 'should evaluate call to closure with arguments' do
@@ -88,7 +89,7 @@ describe 'Functions calls' do
 		closure = evaluate(parse("(lambda (a b) (+ a b))"), env)
 		ast = [closure, 4, 5]
 
-		expect(evaluate(ast, env)).to eq(9)
+		assert_equal evaluate(ast, env), 9
 	end
 
 	it 'should evaluate all arguments when calling to function' do
@@ -98,7 +99,7 @@ describe 'Functions calls' do
 		closure = evaluate(parse("(lambda (a) (+ a 5))"), env)
 		ast = [closure, parse("(if #f 0 (+ 10 10))")]
 
-		expect(evaluate(ast,env)).to eq(25)
+		assert_equal evaluate(ast,env), 25
 	end
 
 	it 'should evaluate the body in the env from the closure' do
@@ -109,7 +110,7 @@ describe 'Functions calls' do
 		ast = [closure, 0]
 		result = evaluate(ast, Environment.new({"y" => 2}))
 
-		expect(result).to eq(1)
+		assert_equal result, 1
 	end
 end
 
@@ -130,10 +131,11 @@ describe 'Lambda' do
 		# replaced with its value should then be evaluated instead.
 		env = Environment.new
 		evaluate(parse("(define add (lambda (x y) (+ x y)))"), env)
-		expect(env.lookup("add")).to be_a Closure
+		assert_kind_of(Closure, env.lookup("add"))
+		
 
 		result = evaluate(parse("(add 1 2)"), env)
-		expect(result).to eq(3)
+		assert_equal result, 3
 	end
 
 	it 'should be able to be defined and called directly' do
@@ -141,7 +143,7 @@ describe 'Lambda' do
 		# and then evaluated as before.
 		ast = parse("((lambda (x) x) 42)")
 		result = evaluate(ast, Environment.new)
-		expect(result).to eq(42)
+		assert_equal result, 42
 	end
 
 	it 'should call complex expression which evaluates to function' do
@@ -153,15 +155,15 @@ describe 'Lambda' do
 		# already know how to evaluate.
 		ast = parse("((if #f wont-evaluate-this-branch (lambda (x) (+ x y))) 2)")
 		env = Environment.new({"y" => 3})
-		expect(evaluate(ast, env)).to eq(5)
+		assert_equal evaluate(ast, env), 5
 	end
 #
 # Now that we have the happy cases working, let's see what happen when functions calls are done incorrectly
 #
 
 	it 'should result in an error when calling a non-function' do
-		expect{evaluate(parse("(#t 'foo 'bar)"), Environment.new)}.to raise_error(LispError, "not a function")
-		expect{evaluate(parse("(42)"), Environment.new)}.to raise_error(LispError, "not a function")
+		assert_raises(LispError, "not a function") {evaluate(parse("(#t 'foo 'bar)"), Environment.new)}
+		assert_raises(LispError, "not a function") {evaluate(parse("(42)"), Environment.new)}
 	end
 
 	it 'should make sure arguments are evaluated' do
@@ -172,13 +174,13 @@ describe 'Lambda' do
 		# then you should double-check that you are properly evaluating the passed function arguments.
 		env = Environment.new
 		res = evaluate(parse("((lambda (x) x) (+ 1 2))"), env)
-		expect(res).to eq(3)
+		assert_equal res, 3
 	end
 
 	it 'should raise exceptions when called with wrong number of arguments' do
 		env = Environment.new
 		evaluate(parse("(define fn (lambda (p1 p2) 'whatever))"), env)
-		expect{evaluate(parse("(fn 1 2 3)"), env)}.to raise_error(LispError, "wrong number of arguments, expected 2 got 3")
+		assert_raises(LispError, "wrong number of arguments, expected 2 got 3") {evaluate(parse("(fn 1 2 3)"), env)}
 	end
 
 #
@@ -189,7 +191,7 @@ describe 'Lambda' do
 	it 'should be recursive' do
 		env = Environment.new
 		evaluate(parse("(define my-fn (lambda (x) (if (eq x 0) 42 (my-fn (- x 1)))))"), env)
-		expect(evaluate(parse('(my-fn 0)'), env)).to eq(42)
-		expect(evaluate(parse('(my-fn 10)'), env)).to eq(42)
+		assert_equal evaluate(parse('(my-fn 0)'), env), 42
+		assert_equal evaluate(parse('(my-fn 10)'), env), 42
 	end
 end
