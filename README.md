@@ -87,3 +87,6 @@ Have fun!
 - [Part 5: functions](guide/5.md)
 - [Part 6: working with lists](guide/6.md)
 - [Part 7: using your language](guide/7.md)
+
+
+_This project is a port of diy-lisp in from Python to Ruby. Go check the original on Kjetil Valle [Repo](https://github.com/kvalle/diy-lisp)_
