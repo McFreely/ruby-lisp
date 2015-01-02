@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-require 'spec_helper'
+require 'minitest/autorun'
 require './code/evaluator'
 require './code/types'
 
@@ -7,12 +7,12 @@ describe 'Simple Evaluation' do
   environment = Environment.new
 
   it "should evaluate booleans to themselves" do
-    expect(evaluate(true, environment)).to eq(true)
-    expect(evaluate(false, environment)).to eq(false)
+    assert_equal evaluate(true, environment), true
+    assert_equal evaluate(false, environment), false
   end
 
   it 'should evaluate integers to themselves' do
-    expect(evaluate(42, environment)).to eq(42)
+    assert_equal evaluate(42, environment), 42
   end
 
   it 'should evaluate quote' do
@@ -20,8 +20,8 @@ describe 'Simple Evaluation' do
     # being evaluated
     #
     # (quote foo) -> foo
-    expect(evaluate(["quote","foo"], environment)).to eq("foo")
-    expect(evaluate(["quote", [1, 2, false]], environment)).to eq([1, 2, false])
+    assert_equal evaluate(["quote","foo"], environment), "foo"
+    assert_equal evaluate(["quote", [1, 2, false]], environment)
   end
 
   it 'should evaluate atoms' do
@@ -32,27 +32,27 @@ describe 'Simple Evaluation' do
     # or symbols.
     # Remember that the argument to 'atom' must be evaluated before the check is done.
 
-    expect(evaluate(["atom", true], environment)).to eq(true)
-    expect(evaluate(["atom", false], environment)).to eq(true)
-    expect(evaluate(["atom", 42], environment)).to eq(true)
-    expect(evaluate(["atom", ["quote", "foo"]], environment)).to eq(true)
-    expect(evaluate(["atom", ["quote", [1, 2]]], environment)).to eq(false)
+    assert_equal evaluate(["atom", true], environment), true
+    assert_equal evaluate(["atom", false], environment), true
+    assert_equal evaluate(["atom", 42], environment), true
+    assert_equal evaluate(["atom", ["quote", "foo"]], environment), true
+    assert_equal evaluate(["atom", ["quote", [1, 2]]], environment), false
   end
 
   it "should evaluate eq function" do
     # The 'eq' form is used to check whether two expressions are
     # the same atom
-    expect(evaluate(["eq", 1, 1], environment)).to eq(true)
-    expect(evaluate(["eq", 1, 2], environment)).to eq(false)
+    assert_equal evaluate(["eq", 1, 1], environment), true
+    assert_equal evaluate(["eq", 1, 2], environment), false
 
     ast1 = ["eq", ["quote", "foo"], ["quote", "foo"]]
-    expect(evaluate(ast1, environment)).to eq(true)
+    assert_equal evaluate(ast1, environment), true
 
     ast2 = ["eq", ["quote", "foo"], ["quote", "bar"]]
-    expect(evaluate(ast2, environment)).to eq(false)
+    assert_equal evaluate(ast2, environment), false
 
     ast3 = ["eq", ["quote", [1,2,3]], ["quote", [1,2,3]]]
-    expect(evaluate(ast3, environment)).to eq(false)
+    assert_equal evaluate(ast3, environment), false
   end
 
   it "should evaluate basic math operations" do
@@ -62,23 +62,23 @@ describe 'Simple Evaluation' do
     # Since we only operate with integers, '/' must represent integer division.
     # 'mod' is modulo operator
 
-    expect(evaluate(["+", 2, 2], environment)).to eq(4)
-    expect(evaluate(["-", 2, 1], environment)).to eq(1)
-    expect(evaluate(["*", 2, 3], environment)).to eq(6)
-    expect(evaluate(["/", 6, 2], environment)).to eq(3)
-    expect(evaluate(["/", 7, 2], environment)).to eq(3)
-    expect(evaluate(["mod", 7, 2], environment)).to eq(1)
-    expect(evaluate([">", 7, 2], environment)).to eq(true)
-    expect(evaluate([">", 2, 7], environment)).to eq(false)
-    expect(evaluate([">", 7, 7], environment)).to eq(false)
+    assert_equal evaluate(["+", 2, 2], environment), 4
+    assert_equal evaluate(["-", 2, 1], environment), 1
+    assert_equal evaluate(["*", 2, 3], environment), 6
+    assert_equal evaluate(["/", 6, 2], environment), 3
+    assert_equal evaluate(["/", 7, 2], environment), 3
+    assert_equal evaluate(["mod", 7, 2], environment), 1
+    assert_equal evaluate([">", 7, 2], environment), true
+    assert_equal evaluate([">", 2, 7], environment), false
+    assert_equal evaluate([">", 7, 7], environment), false
     # Might need more tests to cover other operators: '<', '<=', '=>'
   end
 
   it 'should evaluate math operations only on numbers' do
-    expect{evaluate(["+", 1 ,["quote", "foo"]], environment)}.to raise_error(LispError)
-    expect{evaluate(["-", 1 ,["quote", "foo"]], environment)}.to raise_error(LispError)
-    expect{evaluate(["*", 1 ,["quote", "foo"]], environment)}.to raise_error(LispError)
-    expect{evaluate(["+", 1 ,["quote", "foo"]], environment)}.to raise_error(LispError)
-    expect{evaluate(["mod", 1 ,["quote", "foo"]], environment)}.to raise_error(LispError)
+    assert_raises(LispError) {evaluate(["+", 1 ,["quote", "foo"]], environment)}
+    assert_raises(LispError) {evaluate(["-", 1 ,["quote", "foo"]], environment)}
+    assert_raises(LispError) {evaluate(["*", 1 ,["quote", "foo"]], environment)}
+    assert_raises(LispError) {evaluate(["+", 1 ,["quote", "foo"]], environment)}
+    assert_raises(LispError) {evaluate(["mod", 1 ,["quote", "foo"]], environment)}
   end
 end
