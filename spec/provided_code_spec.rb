@@ -1,3 +1,5 @@
+require 'minitest/autorun'
+
 require './code/parser'
 require './code/types'
 require './code/ast'
@@ -8,63 +10,63 @@ require './code/ast'
 describe 'find_parens' do
 	it 'should find matching parens' do
 		source = "(foo (bar) '(this ((is)) quoted))"
-		expect(find_matching_paren(source, 0)).to eq(32)
-		expect(find_matching_paren(source, 5)).to eq(9)
+		assert_equal find_matching_paren(source, 0), 32
+		assert_equal find_matching_paren(source, 5), 9
 	end
 
 	it 'should find matching empty parens' do
-		expect(find_matching_paren("()", 0)).to eq(1)
+		assert_equal find_matching_paren("()", 0), 1
 	end
 
 	it 'should throw an expection on bad initial position' do
-		expect{find_matching_paren("string without paren", 4)}.to raise_error(ArgumentError, "Invalid Lisp")
+		assert_raises(LispError, "Invalid Lisp") {find_matching_paren("string without paren", 4)}
 	end
 
 	it 'should throw an expection when there is no closing paren' do		
-		expect{find_matching_paren("string (without matching paren", 7)}.to raise_error(LispError, 'Incomplete expression')
+		assert_raises(LispError, 'Incomplete expression') {find_matching_paren("string (without matching paren", 7)}
 	end
 end
 
 describe 'unparse' do
 	it 'works on atoms' do
-		expect(unparse(123)).to eq("123")
-		expect(unparse(true)).to eq("#t")
-		expect(unparse(false)).to eq("#f")
-		expect(unparse("foo")).to eq("foo")
+		assert_equal unparse(123), "123"
+		assert_equal unparse(true), "#t"
+		assert_equal unparse(false), "#f"
+		assert_equal unparse("foo"), "foo"
 	end
 
 	it 'works on lists' do
-		expect(unparse([["foo", "bar"], "baz"])).to eq("((foo bar) baz)")
+		assert_equal unparse([["foo", "bar"], "baz"]), "((foo bar) baz)"
 	end
 
 	it 'works on quotes' do
 		tree = unparse(["quote", ["quote", ["foo", ["quote", "bar"], ["quote", [1,2]]]]])
-		expect(tree).to eq("''(foo 'bar '(1 2))")
+		assert_equal tree, "''(foo 'bar '(1 2))"
 	end
 
 	it 'works on integers' do
-		expect(unparse(1)).to eq("1")
-		expect(unparse(1337)).to eq("1337")
-		expect(unparse(-42)).to eq("-42")
+		assert_equal unparse(1), "1"
+		assert_equal unparse(1337), "1337"
+		assert_equal unparse(-42), "-42"
 	end
 
 	it 'works on symbols' do
-		expect(unparse("+")).to eq("+")
-		expect(unparse("foo")).to eq("foo")
-		expect(unparse("lambda")).to eq("lambda")
+		assert_equal unparse("+"), "+"
+		assert_equal unparse("foo"), "foo"
+		assert_equal unparse("lambda"), "lambda"
 	end
 
 	it 'works on other lists' do
-		expect(unparse([1,2,3])).to eq("(1 2 3)")
-		expect(unparse(["if", true, 42, false])).to eq("(if #t 42 #f)")
+		assert_equal unparse([1,2,3]), "(1 2 3)"
+		assert_equal unparse(["if", true, 42, false]), "(if #t 42 #f)"
 	end
 
 	it 'works on other quotes' do
-		expect(unparse(["quote", "foo"])).to eq("'foo")
-		expect(unparse(["quote", [1,2,3]])).to eq("'(1 2 3)")
+		assert_equal unparse(["quote", "foo"]), "'foo"
+		assert_equal unparse(["quote", [1,2,3]]), "'(1 2 3)"
 	end
 
 	it 'works on empty list' do
-		expect(unparse([])).to eq("()")
+		assert_equal unparse([]), "()"
 	end
 end
