@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'minitest/autorun'
 
 require './code/types'
 require './code/evaluator'
@@ -13,14 +13,14 @@ require './code/parser'
 describe 'Environment' do
 	it 'should store variables and provide lookup' do
 		env = Environment.new({"var" => 42})
-		expect(env.lookup("var")).to eq(42)
+		assert_equal env.lookup("var"), 42
 	end
 
 	it 'should raise an expection when loooking up an undefined symbol' do
 		# The error message should contain the relevant symbol, and inform
 		# that it has not been defined.
 		empty_env = Environment.new
-		expect{empty_env.lookup("my-missing-var")}.to raise_error(LispError, "my-missing-var")
+		assert_raises(LispError, "my-missing-var") {empty_env.lookup("my-missing-var")}
 	end
 
 	it 'should lookup from inner env' do
@@ -29,15 +29,15 @@ describe 'Environment' do
 
 		env = Environment.new({"foo" => 42})
 		env = env.extend({"bar" => true})
-		expect(env.lookup("foo")).to eq(42)
-		expect(env.lookup("bar")).to eq(true)
+		assert_equal env.lookup("foo"), 42
+		assert_equal env.lookup("bar"), true
 	end
 
 	it 'should lookup a deeply nested var' do
 		# Extending overwrites old bindings to the same variable name
 		# pending "extend doesn't chain correctly but the test should pass otherwise"
 		env = Environment.new({"a" => 1}).extend({"b" => 2}).extend({"c" => 3}).extend({"foo" => 100})
-		expect(env.lookup("foo")).to eq(100)
+		assert_equal env.lookup("foo"), 100
 	end
 
 	it 'should create a new env when extend is called' do
@@ -46,14 +46,14 @@ describe 'Environment' do
 		env = Environment.new({"foo" => 1})
 		extended = env.extend({"foo" => 2})
 
-		expect(env.lookup("foo")).to eq(1)
-		expect(extended.lookup("foo")).to eq(2)
+		assert_equal env.lookup("foo"), 1
+		assert_equal extended.lookup("foo"), 2
 	end
 
 	it 'should update the environment with set' do
 		env = Environment.new
 		env.set("foo", 2)
-		expect(env.lookup("foo")).to eq(2)
+		assert_equal env.lookup("foo"), 2
 	end
 
 	it 'should be illegal to redefine variables' do
@@ -62,7 +62,7 @@ describe 'Environment' do
 		# Setting a variable in a environment where it is already defined
 		# should result in an appropriate error
 		env = Environment.new({"foo" => 1})
-		expect{env.set("foo", 2)}.to raise_error(LispError, "Variable already defined")		
+		assert_raises(LispError, "Variable already defined") {env.set("foo", 2)}
 	end
 end
 
@@ -77,12 +77,12 @@ describe 'Variable Evaluation' do
 		# When evaluating a symbol, the corresponding value should be looked up in
 		# the environment.
 		env = Environment.new({"foo" => 42})
-		expect(evaluate("foo", env)).to eq(42)
+		assert_equal evaluate("foo", env), 42
 	end
 
 	it 'should raise an exception when referencing undefined var' do
 		# This test should already pass if you implemented the environment correctly.
-		expect{evaluate("my_var", Environment.new)}.to raise_error(LispError, "my_var")
+		assert_raises(LispError, "my_var") {evaluate("my_var", Environment.new)}
 	end
 
 	it 'should evaluate define statement' do
@@ -92,24 +92,24 @@ describe 'Variable Evaluation' do
 		# it affects what is printed in the REPL).
 		env = Environment.new
 		evaluate(parse("(define x 1000)"), env)
-		expect(env.lookup("x")).to eq(1000)
+		assert_equal env.lookup("x"), 1000
 	end
 
 	it 'should raise an error when define is called with wrong number of args' do
 		env = Environment.new
-		expect{evaluate(parse("(define x)"), env)}.to raise_error(LispError, "Wrong number of arguments")
-		expect{evaluate(parse("(define x 1 2)"), env)}.to raise_error(LispError, "Wrong number of arguments")
+		assert_raises(LispError, "Wrong number of arguments") {evaluate(parse("(define x)"), env)}
+		assert_raises(LispError, "Wrong number of arguments") {evaluate(parse("(define x 1 2)"), env)}
 	end
 
 	it 'should require the first argument to be a symbol' do
 		env = Environment.new
-		expect{evaluate(parse("(define #t 42)"), env)}.to raise_error(LispError, "Non-symbol")
+		assert_raises(LispError, "Non-symbol") {evaluate(parse("(define #t 42)"), env)}
 	end
 
 	it 'should be able to lookup variable after define' do
 		# This test should already be passing when the above ones are passing.
 		env = Environment.new
 		evaluate(parse("(define foo (+ 2 2))"), env)
-		expect(evaluate("foo", env)).to eq(4)
+		assert_equal evaluate("foo", env), 4
 	end
 end
